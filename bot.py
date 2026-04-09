@@ -14,7 +14,7 @@ def parse_input(value):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_data[update.effective_user.id] = {"step": 1}
     await update.message.reply_text(
-        "👋 Привет, этот бот поможет вам узнать статистику\n\nВведите количество убийств:"
+        "👋 Привет, этот бот поможет вам узнать вашу статистику за матч\n\nВведите количество убийств:"
     )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -36,12 +36,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if step == 1:
         user_data[user_id]["K"] = value
         user_data[user_id]["step"] = 2
-        await update.message.reply_text("Введите помощей:")
+        await update.message.reply_text("Введите количество помощей:")
 
     elif step == 2:
         user_data[user_id]["A"] = value
         user_data[user_id]["step"] = 3
-        await update.message.reply_text("Введите смерти:")
+        await update.message.reply_text("Введите количество смертей:")
 
     elif step == 3:
         user_data[user_id]["D"] = value
