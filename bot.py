@@ -11,6 +11,16 @@ def parse_input(value):
     parts = value.replace('+', ' ').split()
     return sum(int(part) for part in parts)
 
+def get_emoji(value, bad_threshold, good_threshold, reverse=False):
+    if not reverse:
+        if value >= good_threshold: return "🟩"
+        elif value >= bad_threshold: return "🟨"
+        else: return "🟥"
+    else: # Для смертей: чем меньше, тем лучше
+        if value <= good_threshold: return "🟩"
+        elif value <= bad_threshold: return "🟨"
+        else: return "🟥"
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_data[update.effective_user.id] = {"step": 1}
     await update.message.reply_text(
@@ -75,24 +85,4 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         KAST = ((kpr + apr) * 0.7) * 100
         ADR = (K * 100 + A * 70) / R
 
-        RS = ((kpr - 0.5) * 4 + apr * 1.2 + (wins / R) * 2 - dpr * 2.5) * 1.5
-
-        result = (
-            f"📊 Статистика:\n\n"
-            f"K/D: {KD:.2f}\n"
-            f"KPR: {kpr:.2f}\n"
-            f"DPR: {dpr:.2f}\n"
-            f"ADR: {ADR:.0f}\n"
-            f"KAST: {KAST:.0f}%\n"
-            f"Round Swing: {RS:.2f}"
-        )
-
-        await update.message.reply_text(result)
-        del user_data[user_id]
-
-app = ApplicationBuilder().token("8647818616:AAGMjv1Jdj9lM-Gc5y4273Wnhy8WlasNB7Q").build()
-
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
-app.run_polling()
+        RS = ((kpr - 0.5) * 4 + apr
