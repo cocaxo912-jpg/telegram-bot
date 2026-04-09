@@ -85,4 +85,5 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         KAST = ((kpr + apr) * 0.7) * 100
         ADR = (K * 100 + A * 70) / R
 
-        RS = ((kpr - 0.5) * 4 + apr
+        RS = ((kpr - 0.5) * 4 + apr * 1.2 + (wins / R) * 2 - dpr * 2.5) * 1.5
+
