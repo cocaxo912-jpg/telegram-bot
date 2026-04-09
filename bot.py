@@ -2,7 +2,7 @@ import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 
-# 1. Логирование для отслеживания ошибок в Render
+# Настройка логов
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 user_data = {}
@@ -21,7 +21,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     user_data[user_id] = {"step": 1}
     text = "🎮 **STANDOFF 2 STATS**\n\nВведите кол-во убийств (У):"
-    
     if update.message:
         await update.message.reply_text(text, parse_mode="Markdown")
     else:
@@ -36,21 +35,19 @@ async def restart_button_handler(update: Update, context: ContextTypes.DEFAULT_T
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if user_id not in user_data: return
-    
     msg_text = update.message.text.strip()
     step = user_data[user_id]["step"]
 
-    # Проверка для раундов (Шаг 5)
     if step == 5:
         if not msg_text.isdigit():
-            await update.message.reply_text("❌ Введите правильное количество раундов (одно целое число, например: 20)")
+            await update.message.reply_text("❌ Введите одно целое число (например: 20)")
             return
         val = int(msg_text)
     else:
         try:
             val = sum(int(p) for p in msg_text.replace('+', ' ').split())
         except:
-            await update.message.reply_text("❌ Пожалуйста, введите число!")
+            await update.message.reply_text("❌ Введите число!")
             return
 
     if step == 1:
@@ -68,12 +65,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif step == 4:
         user_data[user_id]["Score"] = val
         user_data[user_id]["step"] = 5
-        await update.message.reply_text("Введите общее количество раундов (целое число):")
+        await update.message.reply_text("Введите общее количество раундов:")
     elif step == 5:
         user_data[user_id]["R"] = val
         d = user_data[user_id]
-        
-        # Расчеты
         kd = d["K"] / d["D"] if d["D"] > 0 else d["K"]
         adr = (d["K"] * 100 + d["A"] * 70) / d["R"]
         ppr = d["Score"] / d["R"]
@@ -91,7 +86,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"-------------------\n"
             f"{get_emoji(rating, 0.8, 1.2)} **MATCH RATING:** {rating:.2f}"
         )
-        
         keyboard = [[InlineKeyboardButton("🔄 Начать заново", callback_data="restart_calc")]]
         await update.message.reply_text(res, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(keyboard))
         del user_data[user_id]
